@@ -5,7 +5,8 @@ export default function RecommendationsView() {
   return (
     <div>
       <h1>Recommendations</h1>
-      <p>Recommendations view – floor plan with highlighted tables will go here.</p>
+      <p>Recommendations view: here is a specific date and time floor plan with highlights</p>
     </div>
   )
 }
+

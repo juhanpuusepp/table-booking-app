@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import MainView from './views/MainView'
-import RecommendationsView from './views/RecommendationsView'
+import MainView from './views/MainView/MainView'
+import RecommendationsView from './views/RecommendationsView/RecommendationsView'
 import './App.css'
 
 function App() {

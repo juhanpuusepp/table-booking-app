@@ -1,4 +1,5 @@
-import type { TimetableResponse } from '../api/types'
+import type { TimetableResponse } from '../../api/types'
+import './Timetable.css'
 
 interface TimetableProps {
   data: TimetableResponse | null
@@ -6,8 +7,9 @@ interface TimetableProps {
 
 export default function Timetable({ data }: TimetableProps) {
   return (
-    <div>
+    <div className="timetable">
       <p>Timetable – {data ? `${data.slots.length} slot(s)` : 'no data'}.</p>
     </div>
   )
 }
+

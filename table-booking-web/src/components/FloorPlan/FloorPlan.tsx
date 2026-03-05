@@ -1,4 +1,5 @@
-import type { TableDto } from '../api/types'
+import type { TableDto } from '../../api/types'
+import './FloorPlan.css'
 
 interface FloorPlanProps {
   tables: TableDto[]
@@ -8,8 +9,12 @@ interface FloorPlanProps {
 
 export default function FloorPlan({ tables, showRecommendations = false }: FloorPlanProps) {
   return (
-    <div>
-      <p>Floor plan – {tables.length} table(s). showRecommendations={String(showRecommendations)}</p>
+    <div className="floor-plan">
+      <p>
+        Floor plan – {tables.length} table(s). showRecommendations=
+        {String(showRecommendations)}
+      </p>
     </div>
   )
 }
+
