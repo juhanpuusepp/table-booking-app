@@ -1,0 +1,48 @@
+import type {
+  FloorPlanResponse,
+  RecommendationsResponse,
+  SearchFilters,
+  TimetableResponse,
+} from './types'
+
+const API_BASE = '/api'
+
+export async function getFloorPlan(params: {
+  date: string
+  time: string
+  zoneId?: string
+  partySize?: number
+}): Promise<FloorPlanResponse> {
+  const search = new URLSearchParams({
+    date: params.date,
+    time: params.time,
+  })
+  if (params.zoneId != null) search.set('zoneId', params.zoneId)
+  if (params.partySize != null) search.set('partySize', String(params.partySize))
+  const res = await fetch(`${API_BASE}/floor-plan?${search}`)
+  if (!res.ok) throw new Error(`floor-plan: ${res.status}`)
+  return res.json()
+}
+
+export async function getTimetable(params: {
+  date: string
+  zoneId?: string
+  partySize?: number
+}): Promise<TimetableResponse> {
+  const search = new URLSearchParams({ date: params.date })
+  if (params.zoneId != null) search.set('zoneId', params.zoneId)
+  if (params.partySize != null) search.set('partySize', String(params.partySize))
+  const res = await fetch(`${API_BASE}/timetable?${search}`)
+  if (!res.ok) throw new Error(`timetable: ${res.status}`)
+  return res.json()
+}
+
+export async function getRecommendations(filters: SearchFilters): Promise<RecommendationsResponse> {
+  const res = await fetch(`${API_BASE}/recommendations`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(filters),
+  })
+  if (!res.ok) throw new Error(`recommendations: ${res.status}`)
+  return res.json()
+}
