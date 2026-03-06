@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import FiltersPanel from '../../components/FiltersPanel/FiltersPanel'
+import FloorPlan from '../../components/FloorPlan/FloorPlan'
 import './MainView.css'
 
 type ViewMode = 'floor' | 'timetable'
@@ -9,6 +11,7 @@ type ViewMode = 'floor' | 'timetable'
  */
 export default function MainView() {
   const [viewMode, setViewMode] = useState<ViewMode>('floor')
+  const navigate = useNavigate()
 
   return (
     <main className="main-view">
@@ -56,7 +59,7 @@ export default function MainView() {
       <section className="main-view__content">
         {viewMode === 'floor' ? (
           <div className="main-view__placeholder">
-            <span>Floor plan view placeholder</span>
+            <FloorPlan showRecommendations={false} onTableClick={(tableId) => navigate('/reservation', { state: { tableId } })} />
           </div>
         ) : (
           <div className="main-view__placeholder">

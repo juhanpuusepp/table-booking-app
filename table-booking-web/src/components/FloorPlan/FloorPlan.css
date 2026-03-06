@@ -1,6 +1,78 @@
 .floor-plan {
-  border: 1px dashed #bbbbbb;
-  padding: 0.75rem;
-  border-radius: 4px;
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: 6px;
+  border: 1px solid #cccccc;
+  background-color: #fafafa;
 }
 
+/* custom tooltip that follows the cursor a visible on hover */
+.floor-plan__tooltip {
+  position: fixed;
+  transform: translate(10px, 10px);
+  padding: 0.35rem 0.6rem;
+  font-size: 0.85rem;
+  background-color: #333333;
+  color: #f5f5f5;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 1000;
+  white-space: nowrap;
+}
+
+.floor-plan__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 280px;
+}
+
+/* zone backgrounds */
+.floor-plan__zone {
+  fill: #f0f0f0;
+  stroke: none;
+}
+
+.floor-plan__zone--main {
+  fill: #f5f5f5;
+}
+
+.floor-plan__zone--private {
+  fill: #ebebeb;
+}
+
+.floor-plan__zone--terrace {
+  fill: #e8f0e8;
+}
+
+/* walls: dark grey lines */
+.floor-plan__wall {
+  fill: #555555;
+  stroke: none;
+}
+
+.floor-plan__table {
+  fill: #d8e0d8;
+  stroke: #333333;
+  stroke-width: 1.5;
+  cursor: pointer;
+}
+
+.floor-plan__table--available {
+  fill: #d8e0d8;
+  stroke: #333333;
+}
+
+.floor-plan__table--occupied {
+  fill: #e0e0e0;
+  stroke: #777777;
+  opacity: 0.85;
+}
+
+.floor-plan__table--recommended {
+  fill: #e8e8c8;
+  stroke: #666622;
+  stroke-width: 2;
+}

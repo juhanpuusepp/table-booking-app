@@ -26,7 +26,7 @@ export default function RecommendationsView() {
       </header>
 
       <div className="recommendations-view__content">
-        <FloorPlan tables={placeholderTables} showRecommendations />
+        <FloorPlan tables={placeholderTables} showRecommendations onTableClick={(tableId) => navigate('/reservation', { state: { tableId } })} />
       </div>
     </section>
   )
