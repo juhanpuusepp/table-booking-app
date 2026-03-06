@@ -56,9 +56,10 @@
   border: 1px solid #cccccc;
   border-radius: 8px;
   min-height: 380px;
+  height: 380px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: stretch;
   color: #555555;
   background-color: #f8f8f8;
 }

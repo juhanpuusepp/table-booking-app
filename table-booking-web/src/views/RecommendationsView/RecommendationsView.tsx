@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import FloorPlan from '../../components/FloorPlan/FloorPlan'
 import type { TableDto } from '../../api/types'
+import '../MainView/MainView.css'
 import './RecommendationsView.css'
 
 /**
@@ -9,7 +10,7 @@ import './RecommendationsView.css'
 export default function RecommendationsView() {
   const navigate = useNavigate()
 
-  // placeholder tables until backend is wired in
+  // placeholder tables until backend is connected
   const placeholderTables: TableDto[] = []
 
   return (
@@ -25,7 +26,7 @@ export default function RecommendationsView() {
         </button>
       </header>
 
-      <div className="recommendations-view__content">
+      <div className="main-view__placeholder">
         <FloorPlan tables={placeholderTables} showRecommendations onTableClick={(tableId) => navigate('/reservation', { state: { tableId } })} />
       </div>
     </section>

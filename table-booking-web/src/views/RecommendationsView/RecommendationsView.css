@@ -2,6 +2,8 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  width: 100%;
+  text-align: left;
 }
 
 .recommendations-view__header {
@@ -13,17 +15,6 @@
 
 .recommendations-view__title {
   margin: 0;
-}
-
-.recommendations-view__content {
-  border: 1px solid #cccccc;
-  border-radius: 8px;
-  min-height: 380px;
-  padding: 1rem;
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  background-color: #f8f8f8;
 }
 
 .recommendations-view__back-button {
