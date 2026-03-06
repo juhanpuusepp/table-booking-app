@@ -1,12 +1,34 @@
+import { useNavigate } from 'react-router-dom'
+import FloorPlan from '../../components/FloorPlan/FloorPlan'
+import type { TableDto } from '../../api/types'
+import './RecommendationsView.css'
+
 /**
- * Recommendations view: floor plan for selected filters with recommended tables highlighted.
+ * floor plan for selected filters with recommended tables highlighted
  */
 export default function RecommendationsView() {
+  const navigate = useNavigate()
+
+  // placeholder tables until backend is wired in
+  const placeholderTables: TableDto[] = []
+
   return (
-    <div>
-      <h1>Recommendations</h1>
-      <p>Recommendations view: here is a specific date and time floor plan with highlights</p>
-    </div>
+    <section className="recommendations-view">
+      <header className="recommendations-view__header">
+        <h1 className="recommendations-view__title">Recommendations</h1>
+        <button
+          type="button"
+          className="recommendations-view__back-button"
+          onClick={() => navigate('/')}
+        >
+          Back
+        </button>
+      </header>
+
+      <div className="recommendations-view__content">
+        <FloorPlan tables={placeholderTables} showRecommendations />
+      </div>
+    </section>
   )
 }
 

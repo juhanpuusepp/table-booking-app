@@ -55,7 +55,7 @@
 .main-view__placeholder {
   border: 1px solid #cccccc;
   border-radius: 8px;
-  min-height: 260px;
+  min-height: 380px;
   display: flex;
   align-items: center;
   justify-content: center;
