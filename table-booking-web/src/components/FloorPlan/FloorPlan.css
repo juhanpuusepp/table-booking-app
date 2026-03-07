@@ -57,21 +57,19 @@
 }
 
 .floor-plan__table {
-  fill: #d8e0d8;
-  stroke: #333333;
   stroke-width: 1.5;
-  cursor: pointer;
 }
 
 .floor-plan__table--available {
-  fill: #d8e0d8;
-  stroke: #333333;
+  fill: #c8e0c8;
+  stroke: #2d5a2d;
+  cursor: pointer;
 }
 
 .floor-plan__table--occupied {
-  fill: #e0e0e0;
-  stroke: #777777;
-  opacity: 0.85;
+  fill: #9a9a9a;
+  stroke: #555555;
+  cursor: not-allowed;
 }
 
 .floor-plan__table--recommended {

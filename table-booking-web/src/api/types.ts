@@ -1,5 +1,5 @@
 /**
- * Types mirroring backend DTOs for table-booking API
+ *  mirroring backend DTOs for table booking API
  */
 
 export interface Zone {
@@ -13,9 +13,18 @@ export interface TableDto {
   zoneId: string
   x: number
   y: number
-  attributes: Set<string> | string[]
+  width: number
+  height: number
+  attributes?: Set<string> | string[]
   occupied: boolean
   recommended: boolean
+}
+
+export interface CreateReservationRequest {
+  tableId: string
+  date: string
+  startTime: string
+  partySize: number
 }
 
 export interface FloorPlanResponse {

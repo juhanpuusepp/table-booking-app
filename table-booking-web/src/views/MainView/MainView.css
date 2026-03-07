@@ -46,6 +46,14 @@
 .main-view__view-toggle-button {
   padding: 0.4rem 0.8rem;
   border-radius: 4px;
+  border: 1px solid #bbbbbb;
+  background: #f0f0f0;
+  cursor: pointer;
+}
+
+.main-view__view-toggle-button--active {
+  background: #e0e0e0;
+  font-weight: 600;
 }
 
 .main-view__content {
@@ -62,6 +70,38 @@
   justify-content: stretch;
   color: #555555;
   background-color: #f8f8f8;
+}
+
+/* single slot for both floor plan and timetable so that there are same dimensions for both views */
+.main-view__view-slot {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background-color: #f8f8f8;
+}
+
+.main-view__view-slot .floor-plan {
+  position: absolute;
+  inset: 0;
+}
+
+.main-view__view-slot:has(.floor-plan) {
+  position: relative;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+.main-view__message {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+}
+
+.main-view__message--error {
+  color: #a00;
 }
 
 .main-view__filters {

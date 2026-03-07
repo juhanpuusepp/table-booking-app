@@ -20,6 +20,30 @@
   color: #555555;
 }
 
+.reservation-view__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.reservation-view__field select {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #bbbbbb;
+  font: inherit;
+  max-width: 6rem;
+}
+
+.reservation-view__message {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.reservation-view__message--error {
+  color: #a00;
+}
+
 .reservation-view__actions {
   display: flex;
   gap: 0.75rem;

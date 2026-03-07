@@ -11,6 +11,8 @@ public record Table(
 		String zoneId,
 		double x,
 		double y,
+		double width,
+		double height,
 		Set<String> attributes
 ) {
 }

@@ -1,4 +1,5 @@
 import type {
+  CreateReservationRequest,
   FloorPlanResponse,
   RecommendationsResponse,
   SearchFilters,
@@ -45,4 +46,23 @@ export async function getRecommendations(filters: SearchFilters): Promise<Recomm
   })
   if (!res.ok) throw new Error(`recommendations: ${res.status}`)
   return res.json()
+}
+
+export async function createReservation(
+  request: CreateReservationRequest
+): Promise<{ id: string; tableId: string }> {
+  const res = await fetch(`${API_BASE}/reservations`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(request),
+  })
+  const data = await res.json()
+  if (!res.ok) {
+    const err = new Error((data as { message?: string }).message ?? `reservations: ${res.status}`) as Error & {
+      status: number
+    }
+    ;(err as Error & { status: number }).status = res.status
+    throw err
+  }
+  return data as { id: string; tableId: string }
 }
