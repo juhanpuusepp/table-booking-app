@@ -35,7 +35,7 @@ const ZONES = [
   { id: 'main', name: 'Indoors', x: 20, y: 20, width: 320, height: 190 },
   { id: 'private', name: 'Private room', x: 340, y: 20, width: 140, height: 80 },
   { id: 'terrace', name: 'Terrace', x: 20, y: 210, width: 412, height: 120 },
-  { id: 'kitchen', name: 'Kitchen', x: 340, y: 101, width: 160, height: 110 }
+  { id: 'kitchen', name: 'Kitchen', x: 340, y: 101, width: 170, height: 110 }
 ] as const
 
 //wall segments
@@ -111,9 +111,7 @@ export default function FloorPlan(props: FloorPlanProps) {
             aria-hidden
             onMouseEnter={(e) => setTooltip({ text: z.name, x: e.clientX, y: e.clientY })}
             onMouseLeave={() => setTooltip(null)}
-          >
-            <title>{z.name}</title>
-          </rect>
+          />
         ))}
         {/* walls */}
         {WALLS.map((w, i) => (
@@ -160,9 +158,7 @@ export default function FloorPlan(props: FloorPlanProps) {
                   handleTableClick(t.id)
                 }
               }}
-            >
-              <title>{`Table ${t.id} – ${t.capacity} seats`}</title>
-            </rect>
+            />
           )
         })}
       </svg>

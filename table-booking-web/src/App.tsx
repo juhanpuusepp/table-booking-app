@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import MainView from './views/MainView/MainView'
+import MyReservationsView from './views/MyReservationsView/MyReservationsView'
 import RecommendationsView from './views/RecommendationsView/RecommendationsView'
 import ReservationView from './views/ReservationView/ReservationView'
 import './App.css'
@@ -11,6 +12,7 @@ function App() {
         <Route path="/" element={<MainView />} />
         <Route path="/recommendations" element={<RecommendationsView />} />
         <Route path="/reservation" element={<ReservationView />} />
+        <Route path="/my-reservations" element={<MyReservationsView />} />
       </Routes>
     </BrowserRouter>
   )

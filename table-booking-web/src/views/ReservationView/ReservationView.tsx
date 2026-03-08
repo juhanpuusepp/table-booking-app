@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { createReservation } from '../../api/api'
+import { addMyReservation } from '../../store/myReservations'
 import './ReservationView.css'
 
 type LocationState = { tableId?: string; date?: string; time?: string } | null
@@ -26,8 +27,15 @@ export default function ReservationView() {
     }
     setStatus('loading')
     try {
-      await createReservation({
+      const result = await createReservation({
         tableId: state.tableId,
+        date: state.date,
+        startTime: state.time,
+        partySize,
+      })
+      addMyReservation({
+        id: result.id,
+        tableId: result.tableId,
         date: state.date,
         startTime: state.time,
         partySize,

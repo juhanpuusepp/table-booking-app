@@ -95,6 +95,13 @@ export default function MainView() {
             >
               {viewMode === 'floor-plan' ? 'See timetable' : 'See floor plan'}
             </button>
+            <button
+              type="button"
+              className="main-view__view-toggle-button"
+              onClick={() => navigate('/my-reservations')}
+            >
+              View my reservations
+            </button>
           </div>
         </div>
       </header>
