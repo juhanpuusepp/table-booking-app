@@ -33,3 +33,8 @@ Use of AI in this project
 - Generate boilerplate code
 - Finish some functions and classes that were analogous to already implemented files
 - Explain more complex data and user flows before implementing functionalities
+- Refactor some code to make existing functions and logic more concise and professional
+
+Additional notes:
+
+Most difficult parts were creating a proper SVG plan and making it interact correctly. Also implementing the drag and drop functionality was hard. The algorithm for recommending tables is quite primitive in my opinion because it lacks the power to give suggestions based on extra requests like being next to windows, in corners etc. Also I didn't manage to include adding and deleting tables in admin view due to poor time management.
