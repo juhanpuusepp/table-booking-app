@@ -17,8 +17,9 @@ Technical description:
 
 Setup instructions:
 - Prerequisites: Git, Java 25, Node.js, npm
+- Ensure that ports 8080 and 5173 are not in use by other apps
 - Clone the repository to a local folder using the command "git clone ..."
-- Open a terminal in the backend folder "table-booking-app" and run command "./gradlew bootRun"
+- Open a terminal in the backend folder "table-booking-app" and run command "./gradlew bootRun" on UNIX shells or "gradlew.bat bootRun" on Windows terminal
 - Open a new terminal in the frontend folder "table-booking-web" and run commands "npm install" and "npm run dev"
 
 Use of AI in this project
