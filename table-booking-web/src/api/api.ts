@@ -8,6 +8,11 @@ import type {
 
 const API_BASE = '/api'
 
+/**
+ * some async functions were written with the help of AI
+ * more complex syntax was corrected by AI
+ */
+
 export async function getFloorPlan(params: {
   date: string
   time: string
