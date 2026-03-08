@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import type { TableDto } from '../../api/types'
 import './FloorPlan.css'
 
@@ -16,7 +16,9 @@ interface StubTable {
 interface FloorPlanProps {
   tables?: TableDto[]
   showRecommendations?: boolean
+  isAdminMode?: boolean
   onTableClick?: (tableId: string, capacity?: number) => void
+  onTablePositionChange?: (tableId: string, x: number, y: number, zoneId: string) => void
 }
 
 // static layout. available/occupied/recommended demo.
@@ -60,8 +62,20 @@ const WALLS = [
 
 const VIEWBOX = { width: 500, height: 350 }
 
+/** returns zone id containing point */
+function getZoneAt(x: number, y: number): string | null {
+  for (const z of ZONES) {
+    if (x >= z.x && x < z.x + z.width && y >= z.y && y < z.y + z.height) return z.id
+  }
+  return null
+}
+
 export default function FloorPlan(props: FloorPlanProps) {
-  const { tables = [], showRecommendations = false, onTableClick } = props
+  const { tables = [], showRecommendations = false, isAdminMode = false, onTableClick, onTablePositionChange } = props
+  const svgRef = useRef<SVGSVGElement>(null)
+  const justDraggedRef = useRef<string | null>(null)
+  const onTablePositionChangeRef = useRef(onTablePositionChange)
+  onTablePositionChangeRef.current = onTablePositionChange
   const useApiTables = tables.length > 0 && tables.every((t) => 'occupied' in t && 'width' in t)
   const displayTables: Array<StubTable & { occupied?: boolean; recommended?: boolean }> = useApiTables
     ? (tables as TableDto[]).map((t) => ({
@@ -78,10 +92,100 @@ export default function FloorPlan(props: FloorPlanProps) {
       }))
     : STUB_TABLES
   const [tooltip, setTooltip] = useState<{ text: string; x: number; y: number } | null>(null)
+  const [dragState, setDragState] = useState<{
+    tableId: string
+    x: number
+    y: number
+    offsetX: number
+    offsetY: number
+    hasMoved: boolean
+    width: number
+    height: number
+    zoneId: string
+  } | null>(null)
+
+  const clientToSvg = useCallback((clientX: number, clientY: number) => {
+    const svg = svgRef.current
+    if (!svg) return { x: 0, y: 0 }
+    const pt = svg.createSVGPoint()
+    pt.x = clientX
+    pt.y = clientY
+    const t = pt.matrixTransform(svg.getScreenCTM()?.inverse())
+    return { x: t.x, y: t.y }
+  }, [])
+
+  useEffect(() => {
+    if (!dragState) return
+    const onMove = (e: MouseEvent) => {
+      const { x, y } = clientToSvg(e.clientX, e.clientY)
+      setDragState((prev) =>
+        prev
+          ? {
+              ...prev,
+              x: Math.max(0, x - prev.offsetX),
+              y: Math.max(0, y - prev.offsetY),
+              hasMoved: true,
+            }
+          : null
+      )
+    }
+    const onUp = () => {
+      setDragState((prev) => {
+        if (!prev) return null
+        if (prev.hasMoved) {
+          justDraggedRef.current = prev.tableId
+          const centerX = prev.x + prev.width / 2
+          const centerY = prev.y + prev.height / 2
+          const zoneId = getZoneAt(centerX, centerY) ?? prev.zoneId
+          const tableId = prev.tableId
+          const x = prev.x
+          const y = prev.y
+          // invoke callback after this render to avoid "setState during render" of parent
+          const cb = onTablePositionChangeRef.current
+          if (cb) {
+            queueMicrotask(() => {
+              cb(tableId, x, y, zoneId)
+            })
+          }
+          setTimeout(() => {
+            justDraggedRef.current = null
+          }, 0)
+        }
+        return null
+      })
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+  }, [dragState, clientToSvg])
 
   const handleTableClick = (tableId: string, capacity?: number) => {
+    if (justDraggedRef.current === tableId) return
     onTableClick?.(tableId, capacity)
   }
+
+  const handleTableMouseDown = useCallback(
+    (e: React.MouseEvent, t: StubTable & { occupied?: boolean }) => {
+      if (!isAdminMode || !onTablePositionChange) return
+      e.preventDefault()
+      const { x, y } = clientToSvg(e.clientX, e.clientY)
+      setDragState({
+        tableId: t.id,
+        x: t.x,
+        y: t.y,
+        offsetX: x - t.x,
+        offsetY: y - t.y,
+        hasMoved: false,
+        width: t.width,
+        height: t.height,
+        zoneId: t.zoneId,
+      })
+    },
+    [isAdminMode, onTablePositionChange, clientToSvg]
+  )
 
   const handlePointerMove = useCallback((e: React.MouseEvent) => {
     setTooltip((prev) => (prev ? { ...prev, x: e.clientX, y: e.clientY } : null))
@@ -95,6 +199,7 @@ export default function FloorPlan(props: FloorPlanProps) {
       onMouseLeave={() => setTooltip(null)}
     >
       <svg
+        ref={svgRef}
         className="floor-plan__svg"
         viewBox={`0 0 ${VIEWBOX.width} ${VIEWBOX.height}`}
         preserveAspectRatio="xMidYMid meet"
@@ -126,16 +231,19 @@ export default function FloorPlan(props: FloorPlanProps) {
           />
         ))}
         {displayTables.map((t) => {
+          const isDragging = dragState?.tableId === t.id
+          const rx = isDragging ? dragState!.x : t.x
+          const ry = isDragging ? dragState!.y : t.y
           const stateClass = (t as StubTable).state ? `floor-plan__table--${(t as StubTable).state}` : ''
-          const cx = t.x + t.width / 2
-          const cy = t.y + t.height / 2
+          const cx = rx + t.width / 2
+          const cy = ry + t.height / 2
           const starSize = Math.min(t.width, t.height) * 0.35
           return (
             <g key={t.id}>
               <rect
-                className={`floor-plan__table ${stateClass}`}
-                x={t.x}
-                y={t.y}
+                className={`floor-plan__table ${stateClass}${isAdminMode ? ' floor-plan__table--draggable' : ''}`}
+                x={rx}
+                y={ry}
                 width={t.width}
                 height={t.height}
                 data-table-id={t.id}
@@ -144,6 +252,7 @@ export default function FloorPlan(props: FloorPlanProps) {
                   if (t.occupied) return
                   handleTableClick(t.id, t.capacity)
                 }}
+                onMouseDown={isAdminMode ? (e) => handleTableMouseDown(e, t) : undefined}
                 role="button"
                 tabIndex={t.occupied ? -1 : 0}
                 onMouseEnter={(e) =>
@@ -172,7 +281,7 @@ export default function FloorPlan(props: FloorPlanProps) {
                     fill="#c9a227"
                     stroke="#8b6914"
                     strokeWidth="0.6"
-                    d="M0,-10 L2.94,-4.05 L9.51,-3.09 L4.05,1.55 L4.76,6.47 L0,4 L-4.76,6.47 L-4.05,1.55 L-9.51,-3.09 L-2.94,-4.05 Z"
+                    d="M0,-10 L2.94,-4.05 L9.51,-3.09 L5.05,1.55 L6.76,8.47 L0,4 L-6.76,8.47 L-5.05,1.55 L-9.51,-3.09 L-2.94,-4.05 Z"
                   />
                 </g>
               )}

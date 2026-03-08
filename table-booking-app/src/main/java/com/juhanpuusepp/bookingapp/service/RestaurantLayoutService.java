@@ -10,4 +10,6 @@ public interface RestaurantLayoutService {
 	List<Table> getTables();
 
 	List<Zone> getZones();
+
+	void updateTablePosition(String tableId, double x, double y, String zoneId);
 }

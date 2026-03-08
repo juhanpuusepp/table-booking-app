@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import FiltersPanel from '../../components/FiltersPanel/FiltersPanel'
 import FloorPlan from '../../components/FloorPlan/FloorPlan'
-import { getFloorPlan } from '../../api/api'
+import Timetable from '../../components/Timetable/Timetable'
+import { getFloorPlan, updateTablePosition } from '../../api/api'
 import type { FloorPlanResponse } from '../../api/types'
 import './MainView.css'
 
@@ -77,6 +78,7 @@ export default function MainView() {
     const t = getStored('recommendationTime', '18:00')
     return TIME_OPTIONS.includes(t) ? t : '18:00'
   })
+  const [adminMode, setAdminMode] = useState(false)
   const [floorPlan, setFloorPlan] = useState<FloorPlanResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -111,10 +113,20 @@ export default function MainView() {
   useEffect(() => {
     setError(null)
     setLoading(true)
+    let cancelled = false
     getFloorPlan({ date, time: effectiveTime })
-      .then(setFloorPlan)
-      .catch((e) => setError(e instanceof Error ? e.message : 'Failed to load'))
-      .finally(() => setLoading(false))
+      .then((data) => {
+        if (!cancelled) setFloorPlan(data)
+      })
+      .catch((e) => {
+        if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to load')
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [date, effectiveTime])
 
   const handleTableClick = (tableId: string, capacity?: number) => {
@@ -169,7 +181,19 @@ export default function MainView() {
         <div className="main-view__placeholder">
           <div className="main-view__view-slot">
             {viewMode === 'timetable' && (
-              <p className="main-view__message">Timetable view placeholder.</p>
+              <>
+                {loading && <p className="main-view__message">Loading…</p>}
+                {error && <p className="main-view__message main-view__message--error">{error}</p>}
+                {!loading && !error && floorPlan && (
+                  <Timetable
+                    tables={floorPlan.tables}
+                    zones={floorPlan.zones}
+                    onSelectTable={(tableId, capacity) =>
+                      navigate('/reservation', { state: { tableId, date, time: effectiveTime, capacity } })
+                    }
+                  />
+                )}
+              </>
             )}
             {viewMode === 'floor-plan' && (
               <>
@@ -179,7 +203,26 @@ export default function MainView() {
                   <FloorPlan
                     tables={floorPlan.tables}
                     showRecommendations={false}
+                    isAdminMode={adminMode}
                     onTableClick={handleTableClick}
+                    onTablePositionChange={async (tableId, x, y, zoneId) => {
+                      // optimistic update so table doesn't snap back before refetch
+                      setFloorPlan((prev) => {
+                        if (!prev) return prev
+                        return {
+                          ...prev,
+                          tables: prev.tables.map((t) =>
+                            t.id === tableId ? { ...t, x, y, zoneId } : t
+                          ),
+                        }
+                      })
+                      try {
+                        await updateTablePosition(tableId, x, y, zoneId)
+                        const next = await getFloorPlan({ date, time: effectiveTime })
+                        setFloorPlan(next)
+                      } catch {
+                      }
+                    }}
                   />
                 )}
               </>
@@ -211,6 +254,16 @@ export default function MainView() {
             })
           }
         />
+      </section>
+
+      <section className="main-view__admin">
+        <button
+          type="button"
+          className="main-view__view-toggle-button"
+          onClick={() => setAdminMode((prev) => !prev)}
+        >
+          {adminMode ? 'Disable admin privileges' : 'Enable admin privileges'}
+        </button>
       </section>
     </main>
   )

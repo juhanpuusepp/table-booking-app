@@ -6,11 +6,15 @@ import com.juhanpuusepp.bookingapp.dto.FloorPlanResponse;
 import com.juhanpuusepp.bookingapp.dto.RecommendationsResponse;
 import com.juhanpuusepp.bookingapp.dto.SearchFilters;
 import com.juhanpuusepp.bookingapp.dto.TimetableResponse;
+import com.juhanpuusepp.bookingapp.dto.UpdateTablePositionRequest;
 import com.juhanpuusepp.bookingapp.service.FloorPlanService;
 import com.juhanpuusepp.bookingapp.service.RecommendationService;
 import com.juhanpuusepp.bookingapp.service.ReservationService;
+import com.juhanpuusepp.bookingapp.service.RestaurantLayoutService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,11 +32,14 @@ public class BookingController {
 	private final RecommendationService recommendationService;
 	private final ReservationService reservationService;
 
+	private final RestaurantLayoutService layoutService;
+
 	public BookingController(FloorPlanService floorPlanService, RecommendationService recommendationService,
-			ReservationService reservationService) {
+			ReservationService reservationService, RestaurantLayoutService layoutService) {
 		this.floorPlanService = floorPlanService;
 		this.recommendationService = recommendationService;
 		this.reservationService = reservationService;
+		this.layoutService = layoutService;
 	}
 
 	@GetMapping("/floor-plan")
@@ -42,7 +49,9 @@ public class BookingController {
 			@RequestParam(required = false) String zoneId,
 			@RequestParam(required = false) Integer partySize) {
 		FloorPlanResponse response = floorPlanService.getFloorPlan(date, time, zoneId, partySize);
-		return ResponseEntity.ok(response);
+		return ResponseEntity.ok()
+				.header("Cache-Control", "no-store, no-cache, must-revalidate")
+				.body(response);
 	}
 
 	@GetMapping("/timetable")
@@ -72,5 +81,13 @@ public class BookingController {
 			return ResponseEntity.status(201).body(Map.of("id", created.get().id(), "tableId", created.get().tableId()));
 		}
 		return ResponseEntity.status(409).body(Map.of("error", "CONFLICT", "message", "Table not available for this time"));
+	}
+
+	@PatchMapping("/admin/layout/tables/{tableId}")
+	public ResponseEntity<Void> updateTablePosition(
+			@PathVariable String tableId,
+			@RequestBody UpdateTablePositionRequest body) {
+		layoutService.updateTablePosition(tableId, body.x(), body.y(), body.zoneId());
+		return ResponseEntity.noContent().build();
 	}
 }

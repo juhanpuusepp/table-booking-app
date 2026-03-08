@@ -18,7 +18,7 @@ public class CorsConfig {
 		config.setAllowCredentials(true);
 		config.setAllowedOrigins(List.of("http://localhost:5173", "http://127.0.0.1:5173"));
 		config.setAllowedHeaders(List.of("*"));
-		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 		source.registerCorsConfiguration("/api/**", config);
 		return new CorsFilter(source);
 	}

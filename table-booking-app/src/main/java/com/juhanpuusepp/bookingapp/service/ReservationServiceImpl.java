@@ -9,9 +9,8 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * in-memory reservations. Each reservation lasts 2 hours. A table is also
- * unavailable for 1 hour before a reservation (buffer) so the previous guest
- * can have a full 2h slot.
+ * reservations. Each reservation lasts 2 hours. For display,
+ * the slot before a reservation is also shown as occupied (buffer).
  */
 @Service
 public class ReservationServiceImpl implements ReservationService {
@@ -26,12 +25,14 @@ public class ReservationServiceImpl implements ReservationService {
 	@Override
 	public boolean isTableOccupied(String tableId, String date, String time) {
 		int slotHour = parseHour(time);
+		return isSlotUsedByReservation(tableId, date, slotHour) || isSlotUsedByReservation(tableId, date, slotHour + 1);
+	}
+
+	private boolean isSlotUsedByReservation(String tableId, String date, int slotHour) {
 		for (Reservation r : store) {
 			if (!r.tableId().equals(tableId) || !r.date().equals(date)) continue;
 			int startHour = parseHour(r.startTime());
-			// reservation occupies startHour and startHour+1 (2h) plus 1h buffer before
-			int bufferStart = startHour - BUFFER_HOURS_BEFORE;
-			if (slotHour >= bufferStart && slotHour < startHour + RESERVATION_DURATION_HOURS) {
+			if (slotHour >= startHour && slotHour < startHour + RESERVATION_DURATION_HOURS) {
 				return true;
 			}
 		}
@@ -44,9 +45,9 @@ public class ReservationServiceImpl implements ReservationService {
 		if (startHour < MIN_START_HOUR || startHour > MAX_START_HOUR) {
 			return Optional.empty();
 		}
+		// only block on slots actually used by a reservation (not the buffer)
 		for (int h = startHour; h < startHour + RESERVATION_DURATION_HOURS; h++) {
-			String slotTime = formatHour(h);
-			if (isTableOccupied(tableId, date, slotTime)) {
+			if (isSlotUsedByReservation(tableId, date, h)) {
 				return Optional.empty();
 			}
 		}

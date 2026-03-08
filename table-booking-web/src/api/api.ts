@@ -20,7 +20,7 @@ export async function getFloorPlan(params: {
   })
   if (params.zoneId != null) search.set('zoneId', params.zoneId)
   if (params.partySize != null) search.set('partySize', String(params.partySize))
-  const res = await fetch(`${API_BASE}/floor-plan?${search}`)
+  const res = await fetch(`${API_BASE}/floor-plan?${search}`, { cache: 'no-store' })
   if (!res.ok) throw new Error(`floor-plan: ${res.status}`)
   return res.json()
 }
@@ -65,4 +65,18 @@ export async function createReservation(
     throw err
   }
   return data as { id: string; tableId: string }
+}
+
+export async function updateTablePosition(
+  tableId: string,
+  x: number,
+  y: number,
+  zoneId: string
+): Promise<void> {
+  const res = await fetch(`${API_BASE}/admin/layout/tables/${encodeURIComponent(tableId)}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ x, y, zoneId }),
+  })
+  if (!res.ok) throw new Error(`update table position: ${res.status}`)
 }
