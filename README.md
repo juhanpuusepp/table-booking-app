@@ -1,13 +1,14 @@
 # table-booking-app
 **Website for making table reservations in a restaurant.**
 
-Features:
+User features:
 - The user can browse the availability of different tables in a restaurant by viewing the floor plan or checking the time table.
 - The user can check different dates and times for availability.
 - The user can reserve tables using the interactive floor plan or choosing from the time table.
 - The user can choose the party size.
 - The user can insert info about a wanted reservation and be presented with a floor plan that highlights recommended tables.
 - The user can switch to admin mode to change the positions of tables by drag and dropping them on the floor plan.
+- The user can see all their reservations under the my reservations view
 
 Technical description:
 - Frontend: React 19.2.0, TypeScript, Vite, port 5173
