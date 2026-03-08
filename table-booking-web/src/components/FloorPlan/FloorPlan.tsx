@@ -16,7 +16,7 @@ interface StubTable {
 interface FloorPlanProps {
   tables?: TableDto[]
   showRecommendations?: boolean
-  onTableClick?: (tableId: string) => void
+  onTableClick?: (tableId: string, capacity?: number) => void
 }
 
 // static layout. available/occupied/recommended demo.
@@ -79,8 +79,8 @@ export default function FloorPlan(props: FloorPlanProps) {
     : STUB_TABLES
   const [tooltip, setTooltip] = useState<{ text: string; x: number; y: number } | null>(null)
 
-  const handleTableClick = (tableId: string) => {
-    onTableClick?.(tableId)
+  const handleTableClick = (tableId: string, capacity?: number) => {
+    onTableClick?.(tableId, capacity)
   }
 
   const handlePointerMove = useCallback((e: React.MouseEvent) => {
@@ -139,7 +139,7 @@ export default function FloorPlan(props: FloorPlanProps) {
               aria-label={`Table ${t.id}, ${t.capacity} seats${t.occupied ? ' (occupied)' : ''}`}
               onClick={() => {
                 if (t.occupied) return
-                handleTableClick(t.id)
+                handleTableClick(t.id, t.capacity)
               }}
               role="button"
               tabIndex={t.occupied ? -1 : 0}
@@ -155,7 +155,7 @@ export default function FloorPlan(props: FloorPlanProps) {
                 if (t.occupied) return
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault()
-                  handleTableClick(t.id)
+                  handleTableClick(t.id, t.capacity)
                 }
               }}
             />

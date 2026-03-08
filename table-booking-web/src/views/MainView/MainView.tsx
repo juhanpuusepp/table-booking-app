@@ -58,8 +58,8 @@ export default function MainView() {
       .finally(() => setLoading(false))
   }, [date, effectiveTime])
 
-  const handleTableClick = (tableId: string) => {
-    navigate('/reservation', { state: { tableId, date, time: effectiveTime } })
+  const handleTableClick = (tableId: string, capacity?: number) => {
+    navigate('/reservation', { state: { tableId, date, time: effectiveTime, capacity } })
   }
 
   return (

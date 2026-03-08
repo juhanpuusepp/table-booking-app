@@ -4,7 +4,7 @@ import { createReservation } from '../../api/api'
 import { addMyReservation } from '../../store/myReservations'
 import './ReservationView.css'
 
-type LocationState = { tableId?: string; date?: string; time?: string } | null
+type LocationState = { tableId?: string; date?: string; time?: string; capacity?: number } | null
 
 /**
  * confirmation view to show table id, date, time, and confirm party size.
@@ -18,11 +18,15 @@ export default function ReservationView() {
   const time = state?.time ?? ''
 
   const [partySize, setPartySize] = useState(2)
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'conflict'>('idle')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'conflict' | 'tooManyGuests'>('idle')
 
   const handleConfirm = async () => {
     if (!state?.tableId || !state?.date || !state?.time) {
       setStatus('conflict')
+      return
+    }
+    if (state.capacity != null && partySize > state.capacity) {
+      setStatus('tooManyGuests')
       return
     }
     setStatus('loading')
@@ -73,7 +77,13 @@ export default function ReservationView() {
       </p>
       <label className="reservation-view__field">
         <span>Party size</span>
-        <select value={partySize} onChange={(e) => setPartySize(Number(e.target.value))}>
+        <select
+          value={partySize}
+          onChange={(e) => {
+            setPartySize(Number(e.target.value))
+            if (status === 'tooManyGuests') setStatus('idle')
+          }}
+        >
           {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
             <option key={n} value={n}>
               {n}
@@ -81,6 +91,11 @@ export default function ReservationView() {
           ))}
         </select>
       </label>
+      {status === 'tooManyGuests' && (
+        <p className="reservation-view__message reservation-view__message--error">
+          Too many guests selected for this specific table.
+        </p>
+      )}
       {status === 'conflict' && (
         <p className="reservation-view__message reservation-view__message--error">
           Table not available for this time. Please go back and choose another table or time.
