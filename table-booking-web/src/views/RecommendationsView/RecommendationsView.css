@@ -21,3 +21,24 @@
   align-self: flex-start;
 }
 
+.recommendations-view__chosen {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #333333;
+}
+
+.recommendations-view__message {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+}
+
+.recommendations-view__message--error {
+  color: #a00;
+}
+
+.recommendations-view__no-results {
+  margin: 1rem 0 0;
+  font-size: 0.95rem;
+  color: #555555;
+}
+

@@ -16,13 +16,13 @@ public class RestaurantLayoutServiceImpl implements RestaurantLayoutService {
 	@Override
 	public List<Table> getTables() {
 		return List.of(
-				new Table("T1", 4, "main", 45, 150, 50, 40, Set.of()),
-				new Table("T2", 2, "private", 400, 42, 45, 35, Set.of()),
-				new Table("T3", 6, "terrace", 45, 255, 55, 42, Set.of()),
-				new Table("T4", 6, "terrace", 220, 255, 55, 42, Set.of()),
-				new Table("T5", 6, "terrace", 330, 255, 55, 42, Set.of()),
-				new Table("T7", 4, "main", 235, 150, 50, 40, Set.of()),
-				new Table("T8", 4, "main", 235, 50, 50, 40, Set.of())
+				new Table("T1", 2, "main", 45, 150, 40, 40, Set.of()),
+				new Table("T2", 2, "private", 400, 42, 40, 40, Set.of()),
+				new Table("T3", 4, "terrace", 45, 255, 40, 40, Set.of()),
+				new Table("T4", 6, "terrace", 220, 255, 60, 40, Set.of()),
+				new Table("T5", 6, "terrace", 330, 255, 60, 40, Set.of()),
+				new Table("T7", 8, "main", 235, 150, 80, 40, Set.of()),
+				new Table("T8", 4, "main", 235, 50, 40, 40, Set.of())
 		);
 	}
 

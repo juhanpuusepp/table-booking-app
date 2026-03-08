@@ -9,12 +9,15 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * in memory reservations. each reservation lasts 3 hours from start
+ * in-memory reservations. Each reservation lasts 2 hours. A table is also
+ * unavailable for 1 hour before a reservation (buffer) so the previous guest
+ * can have a full 2h slot.
  */
 @Service
 public class ReservationServiceImpl implements ReservationService {
 
-	private static final int RESERVATION_DURATION_HOURS = 3;
+	private static final int RESERVATION_DURATION_HOURS = 2;
+	private static final int BUFFER_HOURS_BEFORE = 1;
 	private static final int MIN_START_HOUR = 10;
 	private static final int MAX_START_HOUR = 21;
 
@@ -26,7 +29,9 @@ public class ReservationServiceImpl implements ReservationService {
 		for (Reservation r : store) {
 			if (!r.tableId().equals(tableId) || !r.date().equals(date)) continue;
 			int startHour = parseHour(r.startTime());
-			if (slotHour >= startHour && slotHour < startHour + RESERVATION_DURATION_HOURS) {
+			// reservation occupies startHour and startHour+1 (2h) plus 1h buffer before
+			int bufferStart = startHour - BUFFER_HOURS_BEFORE;
+			if (slotHour >= bufferStart && slotHour < startHour + RESERVATION_DURATION_HOURS) {
 				return true;
 			}
 		}

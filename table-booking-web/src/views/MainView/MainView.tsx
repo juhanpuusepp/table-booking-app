@@ -15,6 +15,29 @@ function todayISO() {
 }
 
 const TIME_OPTIONS = ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00']
+const STORAGE_KEY_PREFIX = 'booking_'
+
+function getStored(key: string, fallback: string): string {
+  try {
+    const s = sessionStorage.getItem(STORAGE_KEY_PREFIX + key)
+    if (s != null && s !== '') return s
+  } catch {}
+  return fallback
+}
+
+function getStoredNumber(key: string, fallback: number, min: number, max: number): number {
+  try {
+    const n = Number(sessionStorage.getItem(STORAGE_KEY_PREFIX + key))
+    if (Number.isInteger(n) && n >= min && n <= max) return n
+  } catch {}
+  return fallback
+}
+
+function setStored(key: string, value: string): void {
+  try {
+    sessionStorage.setItem(STORAGE_KEY_PREFIX + key, value)
+  } catch {}
+}
 
 // the minimum date the user can select is today.
 function minDateISO() {
@@ -33,21 +56,57 @@ function allowedTimes(date: string): string[] {
   return TIME_OPTIONS.filter((t) => !isPast(date, t))
 }
 
+const VALID_ZONES = ['main', 'private', 'terrace']
+
 export default function MainView() {
   const navigate = useNavigate()
-  const [date, setDate] = useState(todayISO)
-  const [time, setTime] = useState('18:00')
+  const [date, setDate] = useState(() => getStored('date', todayISO()))
+  const [time, setTime] = useState(() => {
+    const t = getStored('time', '18:00')
+    return TIME_OPTIONS.includes(t) ? t : '18:00'
+  })
   const [viewMode, setViewMode] = useState<'floor-plan' | 'timetable'>('floor-plan')
+  const [partySize, setPartySize] = useState(() => getStoredNumber('partySize', 2, 1, 8))
+  const [zoneId, setZoneId] = useState(() =>
+    VALID_ZONES.includes(getStored('zoneId', 'main')) ? getStored('zoneId', 'main') : 'main'
+  )
+  const [recommendationDate, setRecommendationDate] = useState(() =>
+    getStored('recommendationDate', todayISO())
+  )
+  const [recommendationTime, setRecommendationTime] = useState(() => {
+    const t = getStored('recommendationTime', '18:00')
+    return TIME_OPTIONS.includes(t) ? t : '18:00'
+  })
   const [floorPlan, setFloorPlan] = useState<FloorPlanResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const times = allowedTimes(date)
   const effectiveTime = times.includes(time) ? time : times[0] ?? '18:00'
+  const recommendationTimes = allowedTimes(recommendationDate)
+  const effectiveRecommendationTime = recommendationTimes.includes(recommendationTime)
+    ? recommendationTime
+    : recommendationTimes[0] ?? '18:00'
 
   useEffect(() => {
     if (!times.includes(time)) setTime(times[0] ?? '18:00')
   }, [date])
+
+  useEffect(() => {
+    if (!recommendationTimes.includes(recommendationTime)) {
+      setRecommendationTime(recommendationTimes[0] ?? '18:00')
+    }
+  }, [recommendationDate])
+
+  // persist pickers so they survive navigation
+  useEffect(() => {
+    setStored('date', date)
+    setStored('time', time)
+    setStored('recommendationDate', recommendationDate)
+    setStored('recommendationTime', recommendationTime)
+    setStored('partySize', String(partySize))
+    setStored('zoneId', zoneId)
+  }, [date, time, recommendationDate, recommendationTime, partySize, zoneId])
 
   useEffect(() => {
     setError(null)
@@ -130,7 +189,28 @@ export default function MainView() {
       </section>
 
       <section className="main-view__filters">
-        <FiltersPanel />
+        <FiltersPanel
+          recommendationDate={recommendationDate}
+          recommendationTime={effectiveRecommendationTime}
+          recommendationTimeOptions={recommendationTimes}
+          minDate={minDateISO()}
+          partySize={partySize}
+          zoneId={zoneId}
+          onRecommendationDateChange={setRecommendationDate}
+          onRecommendationTimeChange={setRecommendationTime}
+          onPartySizeChange={setPartySize}
+          onZoneChange={setZoneId}
+          onSeeRecommendations={() =>
+            navigate('/recommendations', {
+              state: {
+                date: recommendationDate,
+                time: effectiveRecommendationTime,
+                partySize,
+                zoneId,
+              },
+            })
+          }
+        />
       </section>
     </main>
   )

@@ -127,38 +127,56 @@ export default function FloorPlan(props: FloorPlanProps) {
         ))}
         {displayTables.map((t) => {
           const stateClass = (t as StubTable).state ? `floor-plan__table--${(t as StubTable).state}` : ''
+          const cx = t.x + t.width / 2
+          const cy = t.y + t.height / 2
+          const starSize = Math.min(t.width, t.height) * 0.35
           return (
-            <rect
-              key={t.id}
-              className={`floor-plan__table ${stateClass}`}
-              x={t.x}
-              y={t.y}
-              width={t.width}
-              height={t.height}
-              data-table-id={t.id}
-              aria-label={`Table ${t.id}, ${t.capacity} seats${t.occupied ? ' (occupied)' : ''}`}
-              onClick={() => {
-                if (t.occupied) return
-                handleTableClick(t.id, t.capacity)
-              }}
-              role="button"
-              tabIndex={t.occupied ? -1 : 0}
-              onMouseEnter={(e) =>
-                setTooltip({
-                  text: `Table ${t.id} – ${t.capacity} seats${t.occupied ? ' (occupied)' : ''}`,
-                  x: e.clientX,
-                  y: e.clientY,
-                })
-              }
-              onMouseLeave={() => setTooltip(null)}
-              onKeyDown={(e) => {
-                if (t.occupied) return
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault()
+            <g key={t.id}>
+              <rect
+                className={`floor-plan__table ${stateClass}`}
+                x={t.x}
+                y={t.y}
+                width={t.width}
+                height={t.height}
+                data-table-id={t.id}
+                aria-label={`Table ${t.id}, ${t.capacity} seats${t.occupied ? ' (occupied)' : ''}${t.recommended ? ' (recommended)' : ''}`}
+                onClick={() => {
+                  if (t.occupied) return
                   handleTableClick(t.id, t.capacity)
+                }}
+                role="button"
+                tabIndex={t.occupied ? -1 : 0}
+                onMouseEnter={(e) =>
+                  setTooltip({
+                    text: `Table ${t.id} – ${t.capacity} seats${t.occupied ? ' (occupied)' : ''}${t.recommended ? ' ★ recommended' : ''}`,
+                    x: e.clientX,
+                    y: e.clientY,
+                  })
                 }
-              }}
-            />
+                onMouseLeave={() => setTooltip(null)}
+                onKeyDown={(e) => {
+                  if (t.occupied) return
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    handleTableClick(t.id, t.capacity)
+                  }
+                }}
+              />
+              {t.recommended && (
+                <g
+                  className="floor-plan__table-star"
+                  transform={`translate(${cx}, ${cy}) scale(${starSize / 10})`}
+                  pointerEvents="none"
+                >
+                  <path
+                    fill="#c9a227"
+                    stroke="#8b6914"
+                    strokeWidth="0.6"
+                    d="M0,-10 L2.94,-4.05 L9.51,-3.09 L4.05,1.55 L4.76,6.47 L0,4 L-4.76,6.47 L-4.05,1.55 L-9.51,-3.09 L-2.94,-4.05 Z"
+                  />
+                </g>
+              )}
+            </g>
           )
         })}
       </svg>
