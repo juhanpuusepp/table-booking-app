@@ -46,6 +46,3 @@ lerna-debug.log*
 # OS
 .DS_Store
 Thumbs.db
-
-# Cursor (optional: remove if you want to commit .cursor/rules)
-.cursor/
